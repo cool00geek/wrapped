@@ -1,0 +1,4 @@
+musicbrainzngs
+pylistenbrainz
+pylast
+requests
