@@ -106,7 +106,10 @@ def _last_fm_request(start=None, end=None, **params):
 		params['to'] = end
 	
 	r = requests.get("https://ws.audioscrobbler.com/2.0/", params=params)
-	return r.json()
+	try:
+		return r.json()
+	except:
+		return {}
 
 
 def get_full_data_lastfm(username, start_time=None, end_time=None, artist_dict=None, song_dict=None, tag_dict=None, total_listening_time=0):
@@ -237,8 +240,11 @@ def get_data(username, source=0, time=None):
 		start_time = date(year=year, month=1, day=1)
 		end_time = date(year=year+1, month=1, day=1)
 	else:
-		print("Invalid time parameter given!")
-		exit(1)
+		try:
+			start_time = datetime.date(datetime.strptime(time, "%m-%d-%Y"))
+		except:
+			print("Invalid time parameter given!")
+			exit(1)
 
 	return function(username, start_time=date_to_epoch(start_time),end_time=date_to_epoch(end_time))
 
@@ -247,7 +253,7 @@ if __name__ == "__main__":
 	parser.add_argument('username', type=str, help='Last.FM/ListenBrainz username')
 	parser.add_argument('--fast', dest="fast", help='Use last.fm generated aggregates for faster results. Only works for last 7 days', action="store_true")
 	parser.add_argument('--listenbrainz', dest="listenbrainz", help='Use listenbrainz instead of last.fm', action="store_true")
-	parser.add_argument('-t', '--time', type=str, help="Specify the timeframe. Defaults to all time, you can say 'today', 'week', 'xd' (where x is the number of previous days), '1m', 'xxxxy' (where xxxx is the calendar year), or 'all'")
+	parser.add_argument('-t', '--time', type=str, help="Specify the timeframe. Defaults to all time, you can say 'today', 'week', 'xd' (where x is the number of previous days), '1m', 'xxxxy' (where xxxx is the calendar year), 'all', or a date in MM-DD-YYYY format")
 	parser.add_argument('--output', type=str, help='Filename to output to')
 	parser.add_argument('--input', type=str, help="Read a JSON file instead of getting the data from last.fm/listenbrainz")
 	args = parser.parse_args()
